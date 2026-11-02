@@ -32,10 +32,18 @@ function errorEmbed(err: unknown) {
 }
 
 /** Mensagem livre na DM: interpreta e mostra a previa com botoes. */
+/** "/vincular ABC123" digitado como texto (sem escolher o comando na lista do Discord). */
+const TEXT_COMMAND = /^\/?\s*(vincular|resumo|ajuda|desvincular)\b\s*([a-z0-9]{0,12})\s*$/i;
+
 export async function onDirectMessage(message: Message): Promise<void> {
   const text = message.content.trim();
   if (!text) return;
   try {
+    const command = TEXT_COMMAND.exec(text);
+    if (command) {
+      await onTextCommand(message, command[1].toLowerCase(), command[2]);
+      return;
+    }
     const parsed = await api.parse(message.author.id, text);
     if (parsed.amount === null) {
       await message.reply({
@@ -60,6 +68,32 @@ export async function onDirectMessage(message: Message): Promise<void> {
     await message.reply({ embeds: [previewEmbed(pending)], components });
   } catch (err) {
     await message.reply({ embeds: [errorEmbed(err)] });
+  }
+}
+
+async function onTextCommand(message: Message, name: string, arg: string): Promise<void> {
+  const userId = message.author.id;
+  switch (name) {
+    case 'vincular': {
+      if (!arg) {
+        await message.reply({ embeds: [notLinkedEmbed()] });
+        return;
+      }
+      const { userName } = await api.link(userId, arg);
+      await message.reply({
+        embeds: [infoEmbed('Conta vinculada ✅', `Prontinho, ${userName.split(' ')[0]}! Agora é só me contar seus gastos aqui na DM.`)],
+      });
+      return;
+    }
+    case 'desvincular':
+      await api.unlink(userId);
+      await message.reply({ embeds: [infoEmbed('Conta desvinculada', 'Não vou mais lançar na sua conta.')] });
+      return;
+    case 'resumo':
+      await message.reply({ embeds: [summaryEmbed(await api.summary(userId))] });
+      return;
+    default:
+      await message.reply({ embeds: [helpEmbed()] });
   }
 }
 
