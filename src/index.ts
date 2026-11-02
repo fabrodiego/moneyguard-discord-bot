@@ -1,5 +1,5 @@
 import { createServer } from 'node:http';
-import { ActivityType, Client, Events, GatewayIntentBits, Partials, REST, Routes } from 'discord.js';
+import { Client, Events, GatewayIntentBits, Partials, REST, Routes } from 'discord.js';
 import { commands } from './commands.js';
 import { config } from './config.js';
 import { onButton, onCommand, onDirectMessage, onSelect } from './handlers.js';
@@ -12,7 +12,6 @@ const client = new Client({
 
 client.once(Events.ClientReady, async (c) => {
   console.log(`D7 conectado como ${c.user.tag}`);
-  c.user.setActivity('seus gastos · /ajuda', { type: ActivityType.Watching });
 
   const rest = new REST().setToken(config.discordToken);
   await rest.put(Routes.applicationCommands(config.discordClientId), { body: commands });
