@@ -10,7 +10,7 @@ describe('comando digitado como texto', () => {
   });
 
   it('nao confunde com lancamento', () => {
-    expect(TEXT_COMMAND.exec('gastei 8 reais na sodexo')).toBeNull();
+    expect(TEXT_COMMAND.exec('gastei 8 reais na cantina central')).toBeNull();
     expect(TEXT_COMMAND.exec('resumo do mes de outubro')).toBeNull();
   });
 });

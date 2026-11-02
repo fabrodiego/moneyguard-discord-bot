@@ -47,7 +47,7 @@ export async function onDirectMessage(message: Message): Promise<void> {
     const parsed = await api.parse(message.author.id, text);
     if (parsed.amount === null) {
       await message.reply({
-        embeds: [infoEmbed('Não achei o valor', 'Tente algo como `gastei 8 reais na sodexo`. Use `/ajuda` para ver exemplos.')],
+        embeds: [infoEmbed('Não achei o valor', 'Tente algo como `gastei 8 reais na cantina central`. Use `/ajuda` para ver exemplos.')],
       });
       return;
     }

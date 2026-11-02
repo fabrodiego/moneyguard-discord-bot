@@ -88,7 +88,7 @@ export function helpEmbed(): EmbedBuilder {
     'D7 · MoneyGuard',
     [
       'Me mande uma mensagem privada contando o gasto ou a renda:',
-      '> `acabei de gastar 8 reais na sodexo`',
+      '> `acabei de gastar 8 reais na cantina central`',
       '> `paguei R$ 120,50 de luz ontem`',
       '> `recebi 6.500 de salário`',
       '',

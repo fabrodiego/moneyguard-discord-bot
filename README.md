@@ -3,8 +3,8 @@
 Bot do Discord do **MoneyGuard**. Você conta o gasto em mensagem privada e ele lança na sua conta.
 
 ```
-você: acabei de gastar 8 reais na sodexo
-D7:   Confere o lançamento?  R$ 8,00 · Gasto · hoje · Alimentação · Sodexo
+você: acabei de gastar 8 reais na cantina central
+D7:   Confere o lançamento?  R$ 8,00 · Gasto · hoje · Alimentação · Cantina Central
       [Confirmar] [Trocar categoria] [É renda] [Cancelar]
 ```
 
