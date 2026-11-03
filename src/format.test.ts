@@ -21,3 +21,12 @@ describe('format', () => {
     expect(percentText(4)).toBe('4,0%');
   });
 });
+
+import { scheduleText } from './format.js';
+
+describe('scheduleText', () => {
+  it('descreve a cobranca', () => {
+    expect(scheduleText({ frequency: 'MONTHLY', dayOfMonth: 5, monthOfYear: null })).toBe('Todo dia 5');
+    expect(scheduleText({ frequency: 'YEARLY', dayOfMonth: 5, monthOfYear: 3 })).toBe('Todo ano em 05/mar');
+  });
+});

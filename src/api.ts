@@ -1,6 +1,13 @@
 import { config } from './config.js';
 
 export type TransactionType = 'EXPENSE' | 'INCOME';
+export type Frequency = 'MONTHLY' | 'YEARLY';
+
+export interface RecurrenceInfo {
+  frequency: Frequency;
+  dayOfMonth: number;
+  monthOfYear: number | null;
+}
 
 export interface Ref {
   id: number;
@@ -14,6 +21,7 @@ export interface Parsed {
   description: string | null;
   category: Ref | null;
   merchant: Ref | null;
+  recurrence: RecurrenceInfo | null;
 }
 
 export interface Category {
@@ -54,6 +62,27 @@ export interface Summary {
   month: Totals;
   topExpenses: { name: string; total: number; percent: number }[];
   goals: { balance: number; allocated: number; available: number; goals: Goal[] };
+}
+
+export interface Recurrence extends RecurrenceInfo {
+  id: number;
+  name: string;
+  type: TransactionType;
+  amount: number;
+  monthlyAmount: number;
+  nextDueOn: string | null;
+  category: Category;
+}
+
+export interface RecurrenceList {
+  summary: {
+    monthlyExpenses: number;
+    monthlyIncomes: number;
+    monthlyBalance: number;
+    activeCount: number;
+    next30Days: { name: string; type: TransactionType; amount: number; dueOn: string }[];
+  };
+  active: Recurrence[];
 }
 
 export class ApiError extends Error {
@@ -107,4 +136,15 @@ export const api = {
   deleteTransaction: (discordUserId: string, id: number) =>
     request<void>('DELETE', `/transactions/${id}?${q(discordUserId)}`),
   summary: (discordUserId: string) => request<Summary>('GET', `/summary?${q(discordUserId)}`),
+  createRecurrence: (body: {
+    discordUserId: string;
+    name: string;
+    categoryId: number;
+    merchantId: number | null;
+    amount: number;
+    frequency: Frequency;
+    dayOfMonth: number;
+    monthOfYear: number | null;
+  }) => request<{ recurrence: Recurrence; launchedToday: boolean }>('POST', '/recurrences', body),
+  recurrences: (discordUserId: string) => request<RecurrenceList>('GET', `/recurrences?${q(discordUserId)}`),
 };

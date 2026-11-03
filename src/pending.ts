@@ -1,5 +1,5 @@
 import { randomBytes } from 'node:crypto';
-import type { Parsed, TransactionType } from './api.js';
+import type { Parsed, RecurrenceInfo, TransactionType } from './api.js';
 
 /** Lancamento aguardando o Confirmar. Fica em memoria por 10 minutos. */
 export interface Pending {
@@ -10,6 +10,8 @@ export interface Pending {
   description: string | null;
   category: { id: number; name: string } | null;
   merchant: { id: number; name: string } | null;
+  /** Preenchido quando a frase e uma assinatura ("todo dia 5"). */
+  recurrence: RecurrenceInfo | null;
   expiresAt: number;
 }
 
@@ -32,6 +34,7 @@ export function createPending(discordUserId: string, parsed: Parsed & { amount: 
     description: parsed.description,
     category: parsed.category,
     merchant: parsed.merchant,
+    recurrence: parsed.recurrence,
     expiresAt: Date.now() + TTL_MS,
   });
   return id;

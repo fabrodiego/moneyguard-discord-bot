@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-const TEXT_COMMAND = /^\/?\s*(vincular|resumo|ajuda|desvincular)\b\s*([a-z0-9]{0,12})\s*$/i;
+const TEXT_COMMAND = /^\/?\s*(vincular|resumo|ajuda|desvincular|assinaturas)\b\s*([a-z0-9]{0,12})\s*$/i;
 
 describe('comando digitado como texto', () => {
   it('reconhece /vincular com codigo', () => {

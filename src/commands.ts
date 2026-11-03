@@ -11,6 +11,7 @@ export const commands = [
     )
     .setContexts(contexts),
   new SlashCommandBuilder().setName('resumo').setDescription('Rendas, gastos e metas do mês').setContexts(contexts),
+  new SlashCommandBuilder().setName('assinaturas').setDescription('Suas assinaturas e próximas cobranças').setContexts(contexts),
   new SlashCommandBuilder().setName('desvincular').setDescription('Desliga sua conta do MoneyGuard').setContexts(contexts),
   new SlashCommandBuilder().setName('ajuda').setDescription('Como lançar gastos pelo D7').setContexts(contexts),
 ].map((c) => c.toJSON());

@@ -17,6 +17,9 @@ import {
   notLinkedEmbed,
   previewButtons,
   previewEmbed,
+  recurrenceName,
+  recurrenceSavedEmbed,
+  recurrencesEmbed,
   savedEmbed,
   summaryEmbed,
   undoButton,
@@ -33,7 +36,7 @@ function errorEmbed(err: unknown) {
 
 /** Mensagem livre na DM: interpreta e mostra a previa com botoes. */
 /** "/vincular ABC123" digitado como texto (sem escolher o comando na lista do Discord). */
-const TEXT_COMMAND = /^\/?\s*(vincular|resumo|ajuda|desvincular)\b\s*([a-z0-9]{0,12})\s*$/i;
+const TEXT_COMMAND = /^\/?\s*(vincular|resumo|ajuda|desvincular|assinaturas)\b\s*([a-z0-9]{0,12})\s*$/i;
 
 export async function onDirectMessage(message: Message): Promise<void> {
   const text = message.content.trim();
@@ -92,6 +95,9 @@ async function onTextCommand(message: Message, name: string, arg: string): Promi
     case 'resumo':
       await message.reply({ embeds: [summaryEmbed(await api.summary(userId))] });
       return;
+    case 'assinaturas':
+      await message.reply({ embeds: [recurrencesEmbed(await api.recurrences(userId))] });
+      return;
     default:
       await message.reply({ embeds: [helpEmbed()] });
   }
@@ -120,6 +126,11 @@ export async function onCommand(interaction: ChatInputCommandInteraction): Promi
       case 'resumo': {
         await interaction.deferReply({ flags });
         await interaction.editReply({ embeds: [summaryEmbed(await api.summary(userId))] });
+        return;
+      }
+      case 'assinaturas': {
+        await interaction.deferReply({ flags });
+        await interaction.editReply({ embeds: [recurrencesEmbed(await api.recurrences(userId))] });
         return;
       }
       case 'ajuda':
@@ -164,6 +175,12 @@ export async function onButton(interaction: ButtonInteraction): Promise<void> {
         deletePending(id);
         await interaction.update({ embeds: [infoEmbed('Cancelado', 'Nada foi lançado.')], components: [] });
         return;
+      case 'rec':
+        pending.recurrence = pending.recurrence
+          ? null
+          : { frequency: 'MONTHLY', dayOfMonth: Number(pending.occurredOn.slice(8, 10)), monthOfYear: null };
+        await interaction.update({ embeds: [previewEmbed(pending)], components: [previewButtons(id, pending)] });
+        return;
       case 'type':
         pending.type = pending.type === 'EXPENSE' ? 'INCOME' : 'EXPENSE';
         pending.category = null;
@@ -187,6 +204,21 @@ export async function onButton(interaction: ButtonInteraction): Promise<void> {
       case 'ok': {
         if (!pending.category) return;
         await interaction.deferUpdate();
+        if (pending.recurrence) {
+          const { recurrence, launchedToday } = await api.createRecurrence({
+            discordUserId: userId,
+            name: recurrenceName(pending),
+            categoryId: pending.category.id,
+            merchantId: pending.merchant?.id ?? null,
+            amount: pending.amount,
+            frequency: pending.recurrence.frequency,
+            dayOfMonth: pending.recurrence.dayOfMonth,
+            monthOfYear: pending.recurrence.monthOfYear,
+          });
+          deletePending(id);
+          await interaction.editReply({ embeds: [recurrenceSavedEmbed(recurrence, launchedToday)], components: [] });
+          return;
+        }
         const saved = await api.createTransaction({
           discordUserId: userId,
           categoryId: pending.category.id,
